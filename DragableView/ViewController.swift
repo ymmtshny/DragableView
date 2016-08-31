@@ -8,40 +8,45 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UIGestureRecognizerDelegate {
+    
+    let appView = UIView(frame: CGRectMake(100,100,60,60))
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        let view = UIView(frame: CGRectMake(0,0,60,60))
-        view.backgroundColor = UIColor.redColor()
-        view.layer.cornerRadius = 8
-        view.clipsToBounds = true
-        self.view.addSubview(view)
         
-    
+        appView.backgroundColor = UIColor.redColor()
+        appView.layer.cornerRadius = 8
+        appView.clipsToBounds = true
+        self.view.addSubview(appView)
         
         let gestureRecognizer = UIPanGestureRecognizer(target: self, action:#selector(pan(_:)))
-        view.addGestureRecognizer(gestureRecognizer)
+        appView.addGestureRecognizer(gestureRecognizer)
         
+        let longGesture = UILongPressGestureRecognizer(target: self, action:#selector(longPress(_:)))
+        appView.addGestureRecognizer(longGesture)
         
+        gestureRecognizer.delegate = self
+        longGesture.delegate = self
         
-        let leftWobble = CGAffineTransformRotate(CGAffineTransformIdentity, CGFloat(-3 * M_PI / 180))
-        let rightWobble = CGAffineTransformRotate(CGAffineTransformIdentity, CGFloat(3 * M_PI / 180))
+    }
+    
+    func longPress(seder: UILongPressGestureRecognizer) {
+     
+        let leftWobble = CGAffineTransformRotate(CGAffineTransformIdentity, CGFloat(-5 * M_PI / 180))
+        let rightWobble = CGAffineTransformRotate(CGAffineTransformIdentity, CGFloat(5 * M_PI / 180))
         
-        view.transform = leftWobble //start
+        appView.transform = leftWobble //start
         UIView.beginAnimations("wobble", context: nil)
         UIView.setAnimationRepeatAutoreverses(true)
         UIView.setAnimationRepeatCount(10000)
         UIView.setAnimationDuration(0.1)
         UIView.setAnimationDelegate(self)
         UIView.setAnimationDidStopSelector(#selector(wobbleEnded))
-        
-        view.transform = rightWobble // end here & auto-reverse
-        
+        appView.transform = rightWobble // end here & auto-reverse
         UIView.commitAnimations()
-        
         
     }
     
@@ -58,6 +63,12 @@ class ViewController: UIViewController {
         
         sender.setTranslation(CGPointZero, inView: self.view)
         
+        
+        
+    }
+    
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
     
     override func didReceiveMemoryWarning() {
